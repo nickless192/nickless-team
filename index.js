@@ -30,12 +30,7 @@ const promptManager = () => {
                         return false;
                     }
                 }
-            }, {
-                type: 'list',
-                name: 'whoNext',
-                choices: ['Engineer', 'Intern'],
-        
-            }
+            },
         ]
     )
 };
@@ -51,6 +46,12 @@ const promptTeammates = teamData => {
     `);
 
     return inquirer.prompt([
+        {
+            type: 'list',
+            name: 'member',
+            message: 'Who would you like to add to your team?',
+            choices: ['Engineer', 'Intern'],
+        },
         {
             type: 'text',
             name: 'name',
@@ -79,17 +80,56 @@ const promptTeammates = teamData => {
             type: 'text',
             name: 'github',
             message: 'Please enter your Github user name',
-            validate: (githubInput) => {
+            validate: githubInput => {
                 if (githubInput) {
                     return true;
                 } else {
                     console.log(' Please enter a valid Github user name!');
                     return false;
                 }
+            },
+            when: ({member}) => {
+                if (member === 'Engineer') {
+                    return true;
+                } else {
+                    return false;
+                }
             }
+        },{
+            type: 'text',
+            name: 'school',
+            message: 'What school do/did you attend?',
+            validate: schoolInput => {
+                if (schoolInput) {
+                    return true;
+                } else {
+                    console.log('School name cannot be empty. Please enter your school name!');
+                    return false;
+                }
+            },
+            when: ({member}) => {
+                if (member === 'Intern') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },{
+            type: 'confirm',
+            name: 'addNewMember',
+            message: 'Would you like to add another teammate?',
+            default: false
         }
     
-    ]);
+    ])
+    .then(teammateData => {
+        teamData.members.push(teammateData);
+        if(teammateData.addNewMember) {
+            return promptTeammates(teamData);
+        } else {
+            return teamData;
+        }
+    });
 } 
 
 
@@ -106,4 +146,8 @@ const promptTeammates = teamData => {
 
 // });
 
-promptManager();
+promptManager()
+.then(promptTeammates)
+.then(data => {
+    console.log(data);
+});
