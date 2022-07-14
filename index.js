@@ -1,7 +1,7 @@
 const fs = require('fs');
 const inquirer = require('inquirer');
-
-let id = 0;
+const generatePage = require('./src/page-template');
+const generateSite = require('./utils/generate-site');
 
 const promptManager = () => {
     return inquirer.prompt(
@@ -30,7 +30,19 @@ const promptManager = () => {
                         return false;
                     }
                 }
-            },
+            },{
+                type: 'text',
+                name: 'officeNumber',
+                message: 'What is your office number?',
+                validate: officeNumberInput => {
+                    if (officeNumberInput) {
+                        return true;
+                    } else {
+                        console.log('Please enter your office number!');
+                        return false;
+                    }
+                }
+            }
         ]
     )
 };
@@ -132,22 +144,15 @@ const promptTeammates = teamData => {
     });
 } 
 
-
-
-// inquirer.prompt(questions)
-// .then((data)=> {
-//     console.log(data);
-
-//     if (whoNext === 'Engineer') {
-//         // prompt for engineer
-//     } else {
-//         // prompt for intern
-//     }
-
-// });
-
 promptManager()
 .then(promptTeammates)
 .then(data => {
     console.log(data);
+    return data;
+})
+.then(data => {
+    return generatePage(data);
+})
+.then(htmlData => {
+    return generateSite(htmlData);
 });
