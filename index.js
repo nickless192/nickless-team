@@ -147,7 +147,7 @@ const promptTeammates = teamData => {
 promptManager()
 .then(promptTeammates)
 .then(data => {
-    console.log(data);
+    //console.log(data);
     return data;
 })
 .then(data => {
